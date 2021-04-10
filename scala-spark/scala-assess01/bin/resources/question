@@ -1,0 +1,28 @@
+1) Input: 
+
+Id
+Addr
+101
+12,abc,def,ghi
+102
+13,xyz,lmn
+
+
+Expected Output: 
+Id
+Addr
+101
+12
+101
+abc
+101
+def
+101
+ghi
+102
+13
+102
+xyz
+102
+lmn
+
