@@ -175,3 +175,52 @@ def doStuff(self, rdd):
     field = self.field
     return rdd.map(lambda s: field + s)
 ```
+
+# Closures
+
+Consider the naive RDD element sum below, which may behave differently depending on whether execution is happening within the same JVM. A common example of this is when running Spark in local mode (--master = local[n]) versus deploying a Spark application to a cluster (e.g. via spark-submit to YARN):
+
+```python
+counter = 0
+rdd = sc.parallelize(data)
+
+# Wrong: Don't do this!!
+def increment_counter(x):
+    global counter
+    counter += x
+rdd.foreach(increment_counter)
+
+print("Counter value: ", counter)
+```
+
+## Local vs. cluster modes
+
+The above code may not work as intended
+
+- To execute a job, spark breaks the processing of job into tasks, each of the task is then executed by an executor.
+- Before the execution Spark calculates the ```closure```
+
+```
+Closures are those variables and functions that must be visible to the executor to perform the computation on the RDD, in the current case ```foreach()```.
+```
+
+- This closure is serialized and sent to the executors.
+- The variables in the closures sent to the executors are now copies, so now when foreach() uses the counter variable it is not longer the variable present in the driver node.
+
+- Each executor has its own copy of the variable which is NOT THE SAME VARIABLE AS IN THE DRIVER NODE.
+
+# Accumulators
+
+Accumulators in Spark are used to provide a mechanism for safely updating a variable when execution is split up across worker nodes in a cluster
+
+```
+In general, closures - constructs like loops or locally defined methods, should not be used to mutate some global state.
+```
+
+# Transformations
+
+[Refer this document](https://spark.apache.org/docs/latest/rdd-programming-guide.html#transformations)
+
+# Actions
+
+[Refer this document](https://spark.apache.org/docs/latest/rdd-programming-guide.html#actions)
