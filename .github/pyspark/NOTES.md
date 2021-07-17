@@ -79,7 +79,8 @@ Parallelized collections are created by calling SparkContext’s parallelize met
 
 For example, here is how to create a parallelized collection holding the numbers 1 to 5:
 
-- Syntax: ```
+- Syntax: 
+```
 parallelize([collection], number_of_partitions)
 ```
 
